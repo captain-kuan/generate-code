@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES6",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["DOM", "ES2017"],
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+    }
+  },
+  "exclude": ["node_modules"],
+  "include": ["./**/*"]
+}
