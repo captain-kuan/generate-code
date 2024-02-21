@@ -1,11 +1,14 @@
 <template>
   <div class="preview flex justify-center items-center w-full">
     <div class="bg-white h-48 w-24 shadow-lg">
-      <preview-tool v-for="component in components" :key="component.uid" @click="selectComponent(component)"
-        :isSelected="curComponent === component.uid" :component="component">
-        <component :is="getComponent(component)" v-bind="component">
-        </component>
-      </preview-tool>
+      <vue-draggable ref="el" v-model="components" @update="handleUpdate">
+        <preview-tool v-for="component in components" :key="component.uid" @up="upComponent" @down="downComponent"
+          @delete="deleteComponent" @click="selectComponent(component)" :isSelected="curComponent === component.uid"
+          :component="component">
+          <component :is="getComponent(component)" v-bind="component">
+          </component>
+        </preview-tool>
+      </vue-draggable>
     </div>
 
   </div>
@@ -15,23 +18,51 @@
 import PreviewTool from "@/components/common/PreviewTool.vue";
 import { ComInsConfig, MessageEvent, Message } from "@/types"
 import { getComLibs } from '@/components/lib';
+import { VueDraggable } from 'vue-draggable-plus'
 
-const components = reactive<ComInsConfig[]>([]);
+const components = ref<ComInsConfig[]>([]);
 
 function addComponent(component: ComInsConfig) {
-  component.order = components.length
-  components.push(component)
+  component.order = components.value.length
+  components.value.push(component)
   selectComponent(component)
 }
 
 function updateComponent(component: ComInsConfig) {
-  const com = components.find(item => item.uid === component.uid)
+  const com = components.value.find(item => item.uid === component.uid)
   Object.assign(com, component)
+}
+function deleteComponent(component: ComInsConfig) {
+  const index = components.value.findIndex(item => item.uid === component.uid)
+  components.value.splice(index, 1)
+  handleUpdate()
+}
+
+function upComponent(com: ComInsConfig) {
+  if (com.order === 0) return
+  const last = components.value[com.order - 1]
+  components.value[com.order - 1] = com
+  components.value[com.order] = last
+  last.order = com.order
+  com.order = com.order - 1
+}
+function downComponent(com: ComInsConfig) {
+  if (com.order === components.value.length - 1) return
+  const next = components.value[com.order + 1]
+  components.value[com.order + 1] = com
+  components.value[com.order] = next
+  next.order = com.order
+  com.order = com.order + 1
+}
+
+function handleUpdate() {
+  components.value.forEach((com, index) => { com.order = index })
 }
 
 const eventHandler = {
   addComponent,
-  updateComponent
+  updateComponent,
+  deleteComponent
 }
 
 window.addEventListener("message", (event: any) => {

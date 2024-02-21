@@ -19,6 +19,7 @@ specifiers:
   vant: ^4.4.1
   vite: ^4.3.9
   vue: ^3.0.5
+  vue-draggable-plus: ^0.3.5
   vue-router: ^4.0.10
 
 dependencies:
@@ -31,6 +32,7 @@ dependencies:
   pinia: 2.1.7_vue@3.4.19
   vant: 4.8.4_vue@3.4.19
   vue: 3.4.19
+  vue-draggable-plus: 0.3.5
   vue-router: 4.2.5_vue@3.4.19
 
 devDependencies:
@@ -1900,6 +1902,16 @@ packages:
         optional: true
     dependencies:
       vue: 3.4.19
+
+  /vue-draggable-plus/0.3.5:
+    resolution: {integrity: sha512-HqIxV4Wr4U5LRPLRi2oV+EJ4g6ibyRKhuaiH4ZQo+LxK4zrk2XcBk9UyXC88OXp4SAq0XYH4Wco/T3LX5kJ79A==}
+    peerDependencies:
+      '@types/sortablejs': ^1.15.0
+      '@vue/composition-api': '*'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dev: false
 
   /vue-router/4.2.5_vue@3.4.19:
     resolution: {integrity: sha512-DIUpKcyg4+PTQKfFPX88UWhlagBEBEfJ5A8XDXRJLUnZOvcpMF8o/dnL90vpVkGaPbjvXazV/rC1qBKrZlFugw==}
