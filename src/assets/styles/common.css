@@ -3,9 +3,6 @@
 @tailwind utilities;
 
 #app{
-    font-size: 16.5px;
-    display: flex;
-    flex-direction: column;
-    min-width: 100vw;
+    font-size: 14px;
     min-height: 100vh;
 }

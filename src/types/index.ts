@@ -1,26 +1,31 @@
-import { Message, Chat } from '@ichat/types';
-export * from '@ichat/types';
-export interface Room {
-  roomId: string;
-  users?: string[];
+import { Component } from "vue";
+export interface ComConfig {
+  comType: string;
+  comIcon: string;
+  comName: string;
+}
+export interface ComItem {
+  type: string;
+  getProps: () => Promise<ComConfig>;
+  component: () => Promise<Component>;
+  configComponent: () => Promise<Component>;
+}
+/**
+ * @description 组件实例
+ */
+export interface ComInsConfig {
+  uid?: string;
+  comType: string;
+  order: number;
 }
 
-export interface User {
-  userId: string;
-  avatar: string;
-  name: string;
+export enum MessageEvent {
+  addComponent = "addComponent",
+  updateComponent = "updateComponent",
+  selectComponent = "selectComponent",
 }
 
-export interface UserSelf extends User {
-  token?: string;
+export interface Message {
+  messageType: MessageEvent;
+  data: any;
 }
-
-export interface RootState {
-  ws: null;
-  messages: Message[];
-  rooms: Room[];
-  users: User[];
-  user: UserSelf;
-}
-
-export type ActiveChat = Chat & { lastMsg?: Message };
