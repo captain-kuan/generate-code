@@ -9,7 +9,6 @@
         </preview-tool>
       </vue-draggable>
     </div>
-
   </div>
 </template>
 
