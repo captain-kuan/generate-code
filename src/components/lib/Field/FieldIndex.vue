@@ -1,7 +1,5 @@
 <template>
-    <div>
-        <van-field></van-field>
-    </div>
+    <van-field v-bind="$attrs"></van-field>
 </template>
 
 <script setup lang="ts">

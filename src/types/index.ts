@@ -3,6 +3,7 @@ export interface ComConfig {
   comType: string;
   comIcon: string;
   comName: string;
+  defaultConfig:Record<any,any>
 }
 export interface ComItem {
   type: string;

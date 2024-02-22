@@ -1,16 +1,25 @@
 <template>
-    <div class="flex w-full h-screen">
-        <div class="w-20 grid grid-cols-3 grid-rows-9">
-            <div class="flex flex-col content-center items-center p-1 hover:bg-blue-500 hover:text-white"
-                v-for="com in comList" :key="com.comType" @click="addComponent(com)">
-                <van-icon size="30" :name="com.comIcon" />
-                <span style="font-size: 12px;margin-top: 10px;">{{ com.comName }}</span>
+    <div class="w-full h-screen flex flex-col ">
+        <header class="py-1 px-2 shadow flex items-center justify-between">
+            <div class="">正在编辑</div>
+            <div>
+                <el-button type="info">预览</el-button>
+                <el-button type="success">发布</el-button>
             </div>
-        </div>
-        <iframe ref="preview" class="flex-1" src="/preview"></iframe>
-        <div class="w-20">
-            <component v-if="curComponent" :is="curConfigCom" :config="curComponent"></component>
-        </div>
+        </header>
+        <main class="flex-1 flex">
+            <div class="w-20 grid grid-cols-3 grid-rows-8">
+                <div class="flex flex-col content-center items-center p-1 hover:bg-blue-500 hover:text-white"
+                    v-for="com in comList" :key="com.comType" @click="addComponent(com)">
+                    <van-icon size="30" :name="com.comIcon" />
+                    <span style="font-size: 12px;margin-top: 10px;">{{ com.comName }}</span>
+                </div>
+            </div>
+            <iframe ref="preview" class="flex-1" src="/preview"></iframe>
+            <div class="w-20 p-1">
+                <component v-if="curComponent" :is="curConfigCom" :config="curComponent"></component>
+            </div>
+        </main>
     </div>
 </template>
 
@@ -38,7 +47,7 @@ const preview = ref()
 
 function addComponent(com: ComConfig) {
     const data: ComInsConfig = {
-        ...com,
+        ...(com.defaultConfig || {}),
         comType: com.comType,
         order: -1
     }
@@ -52,8 +61,8 @@ const curComponent = ref<ComInsConfig>()
 const curConfigCom = computed(() => {
     return comLibs.get(curComponent.value.comType).configComponent
 })
-watch(curComponent, (comData) => {
-    updateComponent(toRaw(comData))
+watch(curComponent, (curData, preDate) => {
+    updateComponent(toRaw(curData))
 }, { deep: true })
 
 window.addEventListener("message", (event: any) => {

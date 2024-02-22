@@ -1,17 +1,17 @@
 <template>
     <div class="relative" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
-        <div class=" absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-1">
+        <div v-show="showTool" class=" absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-1">
             <div class="tip-tag from-stone-500 bg-white rounded-sm">
                 {{ component.order + 1 }} {{ comProps?.comName }}
             </div>
         </div>
-        <div class="border" :class="[componentStyle]">
+        <div class="border-2" @click="handleEvent('select', component)" :class="[componentStyle]">
             <slot></slot>
         </div>
-        <div v-show="isSelected" class=" absolute right-0 top-0  translate-y-1/2 translate-x-full">
+        <div v-if="isSelected" class=" absolute right-0 top-0  translate-y-1/2 translate-x-full">
             <div class="flex flex-col tool-list">
                 <div v-for="tool in tools" :key="tool.event" class="bg-white tool-item"
-                    @click="handleClick(tool.event, component)">
+                    @click="handleEvent(tool.event, component)">
                     <van-icon :name="tool.icon"></van-icon>
                 </div>
             </div>
@@ -22,21 +22,28 @@
 <script setup lang="ts">
 import { ComInsConfig, ComConfig } from '@/types';
 import { getComLibs } from "@/components/lib"
-
-enum ToolEvent {
-    up = "up",
-    down = "down",
-    delete = "delete"
-}
+type EventName = 'up' | 'down' | "delete" | 'select'
 type Emit = {
-    (event: ToolEvent.up, com: ComInsConfig): void
-    (event: ToolEvent.down, com: ComInsConfig): void
-    (event: ToolEvent.delete, com: ComInsConfig): void
+    (event: EventName, com: ComInsConfig): void
 }
 const emits = defineEmits<Emit>()
 
-function handleClick(event: ToolEvent, com: ComInsConfig) {
-    //@ts-ignore
+const tools: { event: EventName, icon: string }[] = [
+    {
+        event: 'up',
+        icon: "arrow-up"
+    },
+    {
+        event: "down",
+        icon: "arrow-down"
+    },
+    {
+        event: "delete",
+        icon: "delete-o"
+    },
+]
+
+function handleEvent(event: EventName, com: ComInsConfig) {
     emits(event, com)
 }
 
@@ -44,7 +51,10 @@ const props = defineProps<{ isSelected: boolean, component: ComInsConfig }>()
 
 const comLibs = getComLibs()
 const comProps = ref<ComConfig>()
-comLibs.get(props.component.comType).getProps().then(p => comProps.value = p)
+
+onMounted(async () => {
+    comProps.value = await comLibs.get(props.component.comType).getProps()
+})
 
 const componentStyle = computed(() => {
     return props.isSelected
@@ -55,21 +65,6 @@ const isHovered = ref(false)
 const showTool = computed(() => {
     return props.isSelected || isHovered.value
 })
-const tools: { event: ToolEvent, icon: string }[] = [
-    {
-        event: ToolEvent.up,
-        icon: "arrow-up"
-    },
-    {
-        event: ToolEvent.down,
-        icon: "arrow-down"
-    },
-    {
-        event: ToolEvent.delete,
-        icon: "delete-o"
-    },
-]
-
 
 </script>
 

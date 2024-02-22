@@ -1,12 +1,11 @@
 <template>
-  <div class="preview flex justify-center items-center w-full">
-    <div class="bg-white h-48 w-24 shadow-lg">
-      <vue-draggable ref="el" v-model="components" @update="handleUpdate">
+  <div class="preview py-2 flex justify-center items-center w-full">
+    <div class="bg-white min-h-48 w-24 shadow-lg">
+      <vue-draggable ref="el" v-model="components" @update="updateOrder">
         <preview-tool v-for="component in components" :key="component.uid" @up="upComponent" @down="downComponent"
-          @delete="deleteComponent" @click="selectComponent(component)" :isSelected="curComponent === component.uid"
+          @delete="deleteComponent" @select="selectComponent(component)" :isSelected="curComponentUid === component.uid"
           :component="component">
-          <component :is="getComponent(component)" v-bind="component">
-          </component>
+          <component :is="getComponent(component)" v-bind="component" />
         </preview-tool>
       </vue-draggable>
     </div>
@@ -21,6 +20,13 @@ import { getComLibs } from '@/components/lib';
 import { VueDraggable } from 'vue-draggable-plus'
 
 const components = ref<ComInsConfig[]>([]);
+const curComponentUid = ref("")
+
+function selectComponent(component?: ComInsConfig) {
+  curComponentUid.value = component?.uid
+  const message: Message = { messageType: MessageEvent.selectComponent, data: toRaw(component) }
+  window.parent.postMessage(message)
+}
 
 function addComponent(component: ComInsConfig) {
   component.order = components.value.length
@@ -29,13 +35,15 @@ function addComponent(component: ComInsConfig) {
 }
 
 function updateComponent(component: ComInsConfig) {
-  const com = components.value.find(item => item.uid === component.uid)
+  if (component == null) return
+  const com = components.value.find(item => item.uid === component?.uid)
   Object.assign(com, component)
 }
 function deleteComponent(component: ComInsConfig) {
   const index = components.value.findIndex(item => item.uid === component.uid)
   components.value.splice(index, 1)
-  handleUpdate()
+  updateOrder()
+  selectComponent(toRaw(components.value[index - 1]))
 }
 
 function upComponent(com: ComInsConfig) {
@@ -55,7 +63,7 @@ function downComponent(com: ComInsConfig) {
   com.order = com.order + 1
 }
 
-function handleUpdate() {
+function updateOrder() {
   components.value.forEach((com, index) => { com.order = index })
 }
 
@@ -75,17 +83,12 @@ function getComponent(component: ComInsConfig) {
   return comLibs.get(component.comType).component
 }
 
-const curComponent = ref("")
-function selectComponent(component: ComInsConfig) {
-  curComponent.value = component.uid
-  const message: Message = { messageType: MessageEvent.selectComponent, data: toRaw(component) }
-  window.parent.postMessage(message)
-}
+
 </script>
 
 <style scoped>
 .preview {
-  height: 100vh;
   background: #f7f8fa;
+  min-height: 100vh;
 }
 </style>
