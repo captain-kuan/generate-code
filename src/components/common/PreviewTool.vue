@@ -53,7 +53,7 @@ const comLibs = getComLibs()
 const comProps = ref<ComConfig>()
 
 onMounted(async () => {
-    comProps.value = await comLibs.get(props.component.comType).getProps()
+    comProps.value = await comLibs.get(props.component.comTag).getProps()
 })
 
 const componentStyle = computed(() => {

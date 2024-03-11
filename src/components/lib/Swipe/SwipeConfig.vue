@@ -26,7 +26,6 @@ const dialogVisible = ref(false)
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
 }
 function upload(e) {
-    console.log(e);
     return Promise.resolve({})
 }
 const handleSuccess: UploadProps['onSuccess'] = (response,

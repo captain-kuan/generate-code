@@ -10,12 +10,12 @@
         <main class="flex-1 flex">
             <div class="w-20 grid grid-cols-3 grid-rows-8">
                 <div class="flex flex-col content-center items-center p-1 hover:bg-blue-500 hover:text-white"
-                    v-for="com in comList" :key="com.comType" @click="addComponent(com)">
+                    v-for="com in comList" :key="com.comTag" @click="addComponent(com)">
                     <van-icon size="30" :name="com.comIcon" />
                     <span style="font-size: 12px;margin-top: 10px;">{{ com.comName }}</span>
                 </div>
             </div>
-            <iframe ref="preview" class="flex-1" src="/preview"></iframe>
+            <iframe title="预览" ref="preview" class="flex-1" src="/preview"></iframe>
             <div class="w-20 p-1">
                 <component v-if="curComponent" :is="curConfigCom" :config="curComponent"></component>
             </div>
@@ -48,7 +48,8 @@ const preview = ref()
 function addComponent(com: ComConfig) {
     const data: ComInsConfig = {
         ...(com.defaultConfig || {}),
-        comType: com.comType,
+        comTag: com.comTag,
+        comType:com.comType,
         order: -1
     }
     data.uid = nanoid()
@@ -59,7 +60,7 @@ function updateComponent(data: ComInsConfig) {
 }
 const curComponent = ref<ComInsConfig>()
 const curConfigCom = computed(() => {
-    return comLibs.get(curComponent.value.comType).configComponent
+    return comLibs.get(curComponent.value.comTag).configComponent
 })
 watch(curComponent, (curData, preDate) => {
     updateComponent(toRaw(curData))

@@ -3,9 +3,12 @@
     <div class="bg-white min-h-48 w-24 shadow-lg">
       <vue-draggable ref="el" v-model="components" @update="updateOrder">
         <preview-tool v-for="component in components" :key="component.uid" @up="upComponent" @down="downComponent"
-          @delete="deleteComponent" @select="selectComponent(component)" :isSelected="curComponentUid === component.uid"
-          :component="component">
-          <component :is="getComponent(component)" v-bind="component" />
+                      @delete="deleteComponent" @select="selectComponent(component)"
+                      :isSelected="curComponentUid === component.uid"
+                      :component="component">
+          <component :is="getComponent(component)" v-bind="component">
+            <component v-for="com in component.children" :key="component.uid" :is="getComponent(com)"></component>
+          </component>
         </preview-tool>
       </vue-draggable>
     </div>
@@ -14,23 +17,30 @@
 
 <script setup lang="ts">
 import PreviewTool from "@/components/common/PreviewTool.vue";
-import { ComInsConfig, MessageEvent, Message } from "@/types"
-import { getComLibs } from '@/components/lib';
-import { VueDraggable } from 'vue-draggable-plus'
+import {ComInsConfig, MessageEvent, Message} from "@/types"
+import {getComLibs} from '@/components/lib';
+import {VueDraggable} from 'vue-draggable-plus'
 
 const components = ref<ComInsConfig[]>([]);
 const curComponentUid = ref("")
 
 function selectComponent(component?: ComInsConfig) {
   curComponentUid.value = component?.uid
-  const message: Message = { messageType: MessageEvent.selectComponent, data: toRaw(component) }
+  const message: Message = {messageType: MessageEvent.selectComponent, data: toRaw(component)}
   window.parent.postMessage(message)
 }
 
 function addComponent(component: ComInsConfig) {
   component.order = components.value.length
-  components.value.push(component)
-  selectComponent(component)
+  const curComponent = components.value.find(com => com.uid === curComponentUid.value)
+  console.log(curComponent)
+  if (curComponent?.comType === 'Layout') {
+    curComponent.children = curComponent.children|| []
+    curComponent.children.push(component)
+  } else {
+    components.value.push(component)
+    selectComponent(component)
+  }
 }
 
 function updateComponent(component: ComInsConfig) {
@@ -38,6 +48,7 @@ function updateComponent(component: ComInsConfig) {
   const com = components.value.find(item => item.uid === component?.uid)
   Object.assign(com, component)
 }
+
 function deleteComponent(component: ComInsConfig) {
   const index = components.value.findIndex(item => item.uid === component.uid)
   components.value.splice(index, 1)
@@ -53,6 +64,7 @@ function upComponent(com: ComInsConfig) {
   last.order = com.order
   com.order = com.order - 1
 }
+
 function downComponent(com: ComInsConfig) {
   if (com.order === components.value.length - 1) return
   const next = components.value[com.order + 1]
@@ -63,7 +75,9 @@ function downComponent(com: ComInsConfig) {
 }
 
 function updateOrder() {
-  components.value.forEach((com, index) => { com.order = index })
+  components.value.forEach((com, index) => {
+    com.order = index
+  })
 }
 
 const eventHandler = {
@@ -78,8 +92,9 @@ window.addEventListener("message", (event: any) => {
 })
 
 const comLibs = getComLibs()
+
 function getComponent(component: ComInsConfig) {
-  return comLibs.get(component.comType).component
+  return comLibs.get(component.comTag).component
 }
 
 

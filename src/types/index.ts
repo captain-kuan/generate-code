@@ -1,6 +1,7 @@
 import { Component } from "vue";
 export interface ComConfig {
-  comType: string;
+  comTag: string;
+  comType:"Layout";
   comIcon: string;
   comName: string;
   defaultConfig:Record<any,any>
@@ -16,8 +17,10 @@ export interface ComItem {
  */
 export interface ComInsConfig {
   uid?: string;
-  comType: string;
+  comTag: string;
+  comType?:"Layout";
   order: number;
+  children?:ComInsConfig[];
 }
 
 export enum MessageEvent {
